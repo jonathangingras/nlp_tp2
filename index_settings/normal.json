@@ -1,0 +1,31 @@
+{
+  "settings": {
+    "analysis": {
+      "filter": {
+        "custom_english_stop": {
+          "type":       "stop",
+          "stopwords":  "_english_" 
+        },
+        "custom_english_stemmer": {
+          "type":       "stemmer",
+          "language":   "english"
+        },
+        "custom_english_possessive_stemmer": {
+          "type":       "stemmer",
+          "language":   "possessive_english"
+        }
+      },
+      "analyzer": {
+        "default": {
+          "tokenizer":  "standard",
+          "filter": [
+            "custom_english_possessive_stemmer",
+            "lowercase",
+            "custom_english_stop",
+            "custom_english_stemmer"
+          ]
+        }
+      }
+    }
+  }
+}

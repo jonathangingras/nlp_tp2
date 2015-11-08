@@ -82,7 +82,7 @@ class RequestParser
 	def parse &block
 		File.new(@filename).readlines.each do |line|
 			words = line.split(' ')
-			block.call Request.new(words[0], words[1..-1].join(' '))
+			block.call Request.new(words[0][5..-1].to_i, words[1..-1].join(' '))
 		end
 	end
 end
@@ -95,7 +95,7 @@ class PertinenceParser
 	def parse &block
 		File.new(@filename).readlines.each do |entry|
 			words = entry.split(' ')			
-			block.call words[0], words[1]
+			block.call words[0][5..-1].to_i, words[1]
 		end
 	end
 end
@@ -136,6 +136,10 @@ class PertinenceTable
 		@requests.each { |id, request| str << "#{id} => #{request.pertinent_keys}, " }
 		str.chomp! ", " 
 		str << "}>"
+	end
+
+	def each_request &block
+		@requests.keys.sort.each { |id| block.call @requests[id] }
 	end
 
 	attr_reader :requests

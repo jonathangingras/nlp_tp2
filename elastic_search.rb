@@ -4,10 +4,12 @@ require 'rest-client'
 module ElasticSearch
 
 class Index
-	def initialize handle, name, configurations
+	def initialize handle, name, configurations=nil
 		@handle = handle
 		@name = name
-		@configurations = configurations
+		unless configurations.nil?
+			settings configurations
+		end
 	end
 
 	def << document
@@ -119,7 +121,7 @@ class Handle
 
 	private def index_settings index, settings_query
 		RestClient::put "#{@root}/#{index.name}",
-			settings_query,
+			JSON(settings_query),
 			:content_type => :json
 	end
 end

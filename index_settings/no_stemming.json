@@ -1,0 +1,21 @@
+{
+  "settings": {
+    "analysis": {
+      "filter": {
+        "custom_english_stop": {
+          "type":       "stop",
+          "stopwords":  "_english_" 
+        }
+      },
+      "analyzer": {
+        "default": {
+          "tokenizer":  "standard",
+          "filter": [
+            "lowercase",
+            "custom_english_stop"
+          ]
+        }
+      }
+    }
+  }
+}

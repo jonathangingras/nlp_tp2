@@ -1,5 +1,5 @@
-require './information_retrieval'
 require './elastic_search'
+require './information_retrieval'
 
 require 'gruff'
 

@@ -1,3 +1,4 @@
+require './deps'
 require 'json'
 require 'rest-client'
 

@@ -1,7 +1,7 @@
-require 'json'
-require 'gruff'
 require './information_retrieval'
 require './elastic_search'
+
+require 'gruff'
 
 class Array
 	def mean

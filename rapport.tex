@@ -41,7 +41,7 @@ Premièrement le choix de l'engin de recherche est \textit{ElasticSearch}. Il es
 
 \begin{itemize}
 \item Avoir \verb;bundler; :\\ \verb;$ gem install bundler;
-\item Avoir \verb;imagemagick; : disponible via homebrew sous Mac ou sur environ tous les bon package managers dans le monde GNU/Linux (Le projet ne fonctionne pas sous Windows)
+\item Avoir \verb;imagemagick; : disponible via homebrew sous Mac ou sur tous les bons package managers dans le monde GNU/Linux (Le projet ne fonctionne pas sous Windows).
 \item \verb;cd; vers la racine du projet
 \item \verb;$ bundle install --path vendor/bundle;\\
 \end{itemize}
@@ -66,7 +66,19 @@ Les détails quant à l'implémentation des appels \verb;REST; vers \verb;Elasti
 
 \section{e) Estimation de la précision, rappel et F-mesure pour les configurations testées}
 
-L'estimation est faite de façon à
+Pour chaque requêtes fournies dans \verb;requests.txt;, les clés de documents attendues provenant de \verb;pertinence.txt; sont comparées à celles retournées. Tel que demandé, l'opération est répétée pour chaque configuration testée. Il est possible d'imprimer les résultats moyens en roulant:
+
+\begin{verbatim}
+$ ruby search.rb
+\end{verbatim}
+
+ou
+
+\begin{verbatim}
+$ ruby search.rb --verbose
+\end{verbatim}
+
+pour tous les résultats intermédiaires en détails.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

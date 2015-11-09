@@ -1,3 +1,4 @@
+require './deps'
 require './information_retrieval'
 require './elastic_search'
 

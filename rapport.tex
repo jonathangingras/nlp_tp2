@@ -1,0 +1,73 @@
+\documentclass[12pt]{article}
+\usepackage{epsfig}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage[frenchb]{babel}
+\usepackage{subfigure}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{enumerate}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\addtolength{\oddsidemargin}{-.875in}
+\addtolength{\evensidemargin}{-.875in}
+\addtolength{\textwidth}{1.75in}
+\addtolength{\topmargin}{-.875in}
+\addtolength{\textheight}{1.75in}
+
+\begin{document}
+\selectlanguage{frenchb} 
+\title{NLP \\ Travail pratique 2 \\ Date de remise : 13 novembre 2015, 23h55.}
+\author{Jonathan Gingras}
+
+\maketitle
+
+\begin{center}
+\textbf{Nom:} Jonathan Gingras
+\textbf{\\Matricule:} 111 004 940
+\textbf{\\Numéro du cours:} IFT-7022
+\end{center}
+
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{a\&b) Préalales (installations et fichiers nécéssaires)}
+Premièrement le choix de l'engin de recherche est \textit{ElasticSearch}. Il est donc nécéssaire, avant de rouler le projet, de démarrer une instance de \textit{ElasticSearch} roulant sur le port 9200 (le port par défaut). La version utilisée est 2.0.0. Il est possible qu'une autre version fonctionne, toutefois aucune autre n'a été testée.\\
+
+Également, le projet est implémenté en Ruby (version 2.2.3 de l'interpréteur sous ma machine). Certaines dépendances sont nécéssaires pour rouler le projet. Voici la procédure pour les installer:\\
+
+\begin{itemize}
+\item Avoir \verb;bundler; :\\ \verb;$ gem install bundler;
+\item Avoir \verb;imagemagick; : disponible via homebrew sous Mac ou sur environ tous les bon package managers dans le monde GNU/Linux (Le projet ne fonctionne pas sous Windows)
+\item \verb;cd; vers la racine du projet
+\item \verb;$ bundle install --path vendor/bundle;\\
+\end{itemize}
+
+Les fichiers fournis pour le travail se trouvent dans les fichiers \verb;corpus.txt;, \verb;requests.txt; et \verb;pertinence.txt;. Ils proviennent directement du site du cours. 
+
+\section{c) Indexation}
+Avant de commencer, il est primordiale qu'une instance de \textit{ElasticSearch} roule sur le port 9200. L'indexation est faite en utilisant \verb;index.rb;. Il ne s'agit que de rouler:
+
+\begin{verbatim}
+$ ruby index.rb
+\end{verbatim}
+
+Il est toutefois assez long d'indexer les fichiers, il faut prévoir au moins 10 minutes pour les 4 configurations (4 indexes différents correspondants aux 4 configurations de la prochaine question).
+
+Les détails quant à l'implémentation des appels \verb;REST; vers \verb;ElasticSearch; se retrouvent dans \verb;elastic_search.rb;.
+
+\section{d) Expérimentation sur l'évaluation des différents facteurs}
+\subsection{La normalisation de mots par stemming}
+\subsection{Le retrait de mots outils (stop words)}
+\subsection{La pondération des mots (ex. tf*idf)}
+
+\section{e) Estimation de la précision, rappel et F-mesure pour les configurations testées}
+
+L'estimation est faite de façon à
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}

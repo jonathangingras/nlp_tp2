@@ -106,12 +106,14 @@ class Handle
 		
 		if atts.is_a? Array
 			atts.each { found_lists << [] }
+			attributes = atts
 		else
-			atts = [atts]
+			found_lists << []
+			attributes = [atts]
 		end
 		
-		search_document({"query" => {"match" => {"content" => query}}}, index, type)['hits']['hits'].each do |document|
-			atts.each_with_index do |att, list_index|
+		search_document({query: {match: {content: query}}}, index, type)['hits']['hits'].each do |document|
+			attributes.each_with_index do |att, list_index|
 				found_lists[list_index] << document['_source'][att.to_s]
 			end
 		end

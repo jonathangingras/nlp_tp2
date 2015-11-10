@@ -33,7 +33,6 @@
       "properties": {
         "content": {
           "type":          "string",
-          "index_options": "docs",
           "norms": { "enabled": false }
         }
       }

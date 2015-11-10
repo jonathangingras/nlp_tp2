@@ -7,6 +7,7 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{enumerate}
+\usepackage{hyperref}
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -60,25 +61,62 @@ Il est toutefois assez long d'indexer les fichiers, il faut prévoir au moins 10
 Les détails quant à l'implémentation des appels \verb;REST; vers \verb;ElasticSearch; se retrouvent dans \verb;elastic_search.rb;.
 
 \section{d) Expérimentation sur l'évaluation des différents facteurs}
+Premièrement, pour tester les points demandés, le corpus fourni a été indexé avec plusieurs configurations différentes. Pour configurer les indexes utilisés pour les configurations demandées, les configurations des indexes \verb;ElasticSearch; se retrouvent dans le répertoire \verb;index_settings;.\\
+
+Une première configuration est d'abord utilisée : \verb;normal;. Cette dernière correspond à la configuration standard pour la langue anglaise selon \textit{ElasticSearch}, tel que mentionné à \url{https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-lang-analyzer.html}. Cette configuration est utilisée pours buts de comparaison, pour évaluer l'influence seule des autres facteurs proposés.\\
+
+Les autres configurations sont décrites dans les sous-sections suivantes pour répondre aux questions.
+
 \subsection{La normalisation de mots par stemming}
+Pour le \textit{stemming}, trois configurations sont testées: \verb;kstem;, \verb;porter_stem; et \verb;no_stemming;. Ces configurations sont toutes trois présentes dans \textit{ElasticSearch}. Elles correspondent respectivement au stemers KStem, PorterStem et à aucune stemmatisation. La configuration \verb;normal; utilise PorterStem par défaut. Il est à noter que par défaut, lors de la création d'un index, aucun stemming n'est effectué. \verb;normal; est configuré pour stemmer.\\
+
+Voici une page utilisée : \url{https://www.elastic.co/guide/en/elasticsearch/guide/current/controlling-stemming.html}.
+
 \subsection{Le retrait de mots outils (stop words)}
+Pour évaluer l'influence du filtre de mots outils, la configuration \verb;no_stop_words; est testée. Cette configutation dit à son indexe de ne pas filtrer les mots outils. Pour permettre la comparaison, la configuration \verb;normal; filtre les mots outils.\\
+
+Cette page a été utilisée : \url{https://www.elastic.co/guide/en/elasticsearch/reference/1.4/analysis-stop-tokenfilter.html}.
+
 \subsection{La pondération des mots (ex. tf*idf)}
+Pour évaluer l'influence de la pondération, la confiruation \verb;no_scoring; est testée. Cette configurationdit à son indexe de ne pas considérer ni les \textit{tf, idf} ni de normaliser. Également, la configuration \verb;no_norm; est testée. Cette configuration considère les poids \textit{tf, idf}, mais il n'y a pas de normalisation. Pour la comparaison, \verb;normal; considère tout. Pour ces configurations.\\
+
+Cette page a été utilisée: \url{https://www.elastic.co/guide/en/elasticsearch/guide/current/scoring-theory.html}.
+
+Pour l'exploitation des scores/poids calculés par \textit{ElasticSearch}: \url{https://www.elastic.co/guide/en/elasticsearch/reference/2.0/search-explain.html}.
 
 \section{e) Estimation de la précision, rappel et F-mesure pour les configurations testées}
 
-Pour chaque requêtes fournies dans \verb;requests.txt;, les clés de documents attendues provenant de \verb;pertinence.txt; sont comparées à celles retournées. Tel que demandé, l'opération est répétée pour chaque configuration testée. Il est possible d'imprimer les résultats moyens en roulant:
+Pour chaque requête fournie dans \verb;requests.txt;, les clés de documents attendues provenant de \verb;pertinence.txt; sont comparées à celles retournées. Tel que demandé, l'opération est répétée pour chaque configuration testée. Il est possible d'imprimer les résultats moyens (pour la précsion, le rappel et la F-mesure) en roulant:
 
 \begin{verbatim}
-$ ruby search.rb
+$ ruby analyze.rb --means
 \end{verbatim}
 
 ou
 
 \begin{verbatim}
-$ ruby search.rb --verbose
+$ ruby analyze.rb --verbose
 \end{verbatim}
 
-pour tous les résultats intermédiaires en détails.
+pour tous les résultats intermédiaires permettant de calculer les précédentes moyennes en détails.\\
+
+Une option est également disponible pour imprimer les graphiques (dans le répertoire \verb;graphics; sous la racine) de précision vs. rappel, ainsi que précision et rappel en fonction de l'identifiant des requêtes fournies.
+
+\begin{verbatim}
+$ ruby analyze.rb --graphics
+\end{verbatim}
+
+Finalement, il est également possible d'aller vérifier le poids
+
+$$
+w = tf * idf * norm
+$$
+
+pour chacun des mots d'une requête donnée, retourné pour chaque document trouvé. Par exemple, pour la requête \textit{DD15-13}:
+
+\begin{verbatim}
+$ ruby analyze.rb --weigth 13
+\end{verbatim}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

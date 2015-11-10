@@ -1,4 +1,6 @@
+#!/usr/bin/env ruby
 require './deps'
+
 require './information_retrieval'
 require './elastic_search'
 
@@ -20,7 +22,16 @@ def populate_index index_name, index_settings
 	puts "indexed #{index_name}"
 end
 
-populate_index 'normal', JSON.readfile("index_settings/normal.json")
-populate_index 'no_stemming', JSON.readfile("index_settings/no_stemming.json")
-populate_index 'no_stop_words', JSON.readfile("index_settings/no_stop_words.json")
-populate_index 'no_scoring', JSON.readfile("index_settings/no_scoring.json")
+settings = [
+	:normal,
+	:no_stemming,
+	:no_stop_words,
+	:no_scoring,
+	:kstem,
+	:porter_stem,
+	:no_norm,
+]
+
+settings.each do |setting|	
+	populate_index setting.to_s, JSON.readfile("index_settings/#{setting.to_s}.json")
+end

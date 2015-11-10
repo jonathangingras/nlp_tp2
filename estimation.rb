@@ -1,4 +1,5 @@
-module Estimation
+module InformationRetrieval
+module PrecisionRecall
 
 class ::Array
 	def mean
@@ -30,4 +31,5 @@ class Estimation
 	end
 end
 
+end
 end

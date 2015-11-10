@@ -1,7 +1,0 @@
-\BOOKMARK [1][-]{section.1}{a\046b\) Pr\351alales \(installations et fichiers n\351c\351ssaires\)}{}% 1
-\BOOKMARK [1][-]{section.2}{c\) Indexation}{}% 2
-\BOOKMARK [1][-]{section.3}{d\) Exp\351rimentation sur l'\351valuation des diff\351rents facteurs}{}% 3
-\BOOKMARK [2][-]{subsection.3.1}{La normalisation de mots par stemming}{section.3}% 4
-\BOOKMARK [2][-]{subsection.3.2}{Le retrait de mots outils \(stop words\)}{section.3}% 5
-\BOOKMARK [2][-]{subsection.3.3}{La pond\351ration des mots \(ex. tf*idf\)}{section.3}% 6
-\BOOKMARK [1][-]{section.4}{e\) Estimation de la pr\351cision, rappel et F-mesure pour les configurations test\351es}{}% 7

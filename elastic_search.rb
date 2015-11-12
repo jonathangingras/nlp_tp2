@@ -16,12 +16,12 @@ class Index
 		@handle.__send__ :index_document, self, document
 	end
 
-	def search query
-		@handle.__send__ :search_document, query, self
+	def search query, size=10
+		@handle.__send__ :search_document, query, size, self
 	end
 
-	def match_atts atts, query
-		@handle.__send__ :match_document_atts, atts, query, self
+	def match_atts atts, query, size=10
+		@handle.__send__ :match_document_atts, atts, query, size, self
 	end
 
 	def settings settings_query
@@ -49,12 +49,12 @@ class Handle
 		@indices[name]
 	end
 
-	def search query
-		search_document query
+	def search query, size=10
+		search_document query, size
 	end
 
-	def match_atts atts, query
-		match_document_atts atts, query
+	def match_atts atts, query, size
+		match_document_atts atts, query, size
 	end
 
 	private def index_document index, document, type='document'
@@ -68,7 +68,7 @@ class Handle
 			:content_type => :json
 	end
 
-	private def search_document query, index=nil, type='document'
+	private def search_document query, size, index=nil, type='document'
 		if query.is_a? Hash
 			query_ = JSON(query)
 		else
@@ -89,7 +89,7 @@ class Handle
 		end
 
 		JSON.parse(RestClient::post(
-			"#{@root}#{index_name}#{type_name}/_search",
+			"#{@root}#{index_name}#{type_name}/_search?size=#{size}",
 			query_,
 			:content_type => :json
 		))
@@ -101,7 +101,7 @@ class Handle
 		))
 	end
 
-	private def match_document_atts atts, query, index=nil, type='document'
+	private def match_document_atts atts, query, size, index=nil, type='document'
 		found_lists = []
 		
 		if atts.is_a? Array
@@ -112,7 +112,7 @@ class Handle
 			attributes = [atts]
 		end
 		
-		search_document({query: {match: {content: query}}}, index, type)['hits']['hits'].each do |document|
+		search_document({query: {match: {content: query}}}, size, index, type)['hits']['hits'].each do |document|
 			attributes.each_with_index do |att, list_index|
 				found_lists[list_index] << document['_source'][att.to_s]
 			end

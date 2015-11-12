@@ -42,7 +42,6 @@ Premièrement le choix de l'engin de recherche est \textit{ElasticSearch}. Il es
 
 \begin{itemize}
 \item Avoir \verb;bundler; :\\ \verb;$ gem install bundler;
-\item Avoir \verb;imagemagick; : disponible via homebrew sous Mac ou sur tous les bons package managers dans le monde GNU/Linux (Le projet ne fonctionne pas sous Windows).
 \item \verb;cd; vers la racine du projet
 \item \verb;$ bundle install --path vendor/bundle;\\
 \end{itemize}
@@ -56,7 +55,7 @@ Avant de commencer, il est primordiale qu'une instance de \textit{ElasticSearch}
 $ ruby index.rb
 \end{verbatim}
 
-Il est toutefois assez long d'indexer les fichiers, il faut prévoir au moins 10 minutes pour les 4 configurations (4 indexes différents correspondants aux 4 configurations de la prochaine question).
+Il est toutefois assez long d'indexer les fichiers, il faut prévoir au moins 10 minutes pour les 4 configurations (chaque index différent correspondant à chaque configuration de la prochaine question).
 
 Les détails quant à l'implémentation des appels \verb;REST; vers \verb;ElasticSearch; se retrouvent dans \verb;elastic_search.rb;.
 
@@ -86,7 +85,7 @@ Pour l'exploitation des scores/poids calculés par \textit{ElasticSearch}: \url{
 
 \section{e) Estimation de la précision, rappel et F-mesure pour les configurations testées}
 
-Pour chaque requête fournie dans \verb;requests.txt;, les clés de documents attendues provenant de \verb;pertinence.txt; sont comparées à celles retournées. Tel que demandé, l'opération est répétée pour chaque configuration testée. Il est possible d'imprimer les résultats moyens (pour la précsion, le rappel et la F-mesure) en roulant:
+Pour chaque requête fournie dans \verb;requests.txt;, les clés de documents attendues provenant de \verb;pertinence.txt; sont comparées à celles retournées. Tel que demandé, l'opération est répétée pour chaque configuration testée. Il est possible d'imprimer les résultats moyens (pour la précsion, le rappel, la F-mesure et le MRR\footnote{Il y a une simplification qui a été appliquée au calcul du MRR : on ne considère pas d'autres clés que la première dans le fichier de pertinence. Ainsi, le \textit{rank} correspond à l'index inversé du premier document attendu dans la liste de retour, ou zéro s'il n'est pas présent.}) en roulant:
 
 \begin{verbatim}
 $ ruby analyze.rb --means
@@ -109,7 +108,7 @@ $ ruby analyze.rb --graphics
 Finalement, il est également possible d'aller vérifier le poids
 
 $$
-w = tf * idf * norm
+w = tf \cdot idf \cdot norm
 $$
 
 pour chacun des mots d'une requête donnée, retourné pour chaque document trouvé. Par exemple, pour la requête \textit{DD15-13}:
@@ -117,6 +116,37 @@ pour chacun des mots d'une requête donnée, retourné pour chaque document trou
 \begin{verbatim}
 $ ruby analyze.rb --weigth 13
 \end{verbatim}
+
+Une option est également présente pour tricher sur les résultats. Plus précisément, en utilisant 
+
+\begin{verbatim}
+$ ruby analyze.rb --means --cheat
+\end{verbatim}
+
+le nombre de documents pertinents qui devraient être retournés est donné en paramètre à \textit{ElasticSearch} au lieu de 50. Cette option n'est présente que pour des fins de comparaison.
+
+\section{Observation des résultats}
+
+\begin{center}
+\begin{tabular}{|l|l|l|l|l|}
+	\hline
+  Nom de l'index  & $\mu$ Précision & $\mu$ Rappel & $\mu$ F-mesure & $\mu$ MRR      \\ 
+  (configuration) &                 &              &                &                \\ \hline
+  normal          & 0.4975          & 0.7484145991 & 0.59769146832  & 0.215862205805 \\ \hline
+  no\_stemming    & 0.49083333333   & 0.7392789041 & 0.58996686276  & 0.212380969682 \\ \hline
+  no\_stop\_words & 0.49958333333   & 0.7500447072 & 0.59971419145  & 0.217362212515 \\ \hline
+  no\_scoring     & 0.39291666666   & 0.6547117974 & 0.49110383289  & 0.174909147234 \\ \hline
+  kstem           & 0.5025          & 0.7531072445 & 0.60279421296  & 0.241271232248 \\ \hline
+  porter\_stem    & 0.4975          & 0.7484145991 & 0.59769146832  & 0.215862205805 \\ \hline
+  no\_norm        & 0.49041666666   & 0.7364218088 & 0.58875481322  & 0.228541954625 \\ \hline
+\end{tabular}
+\end{center}
+
+Suite à l'observation des résultats, on peut voir que le retrait du \textit{stemming} et des \textit{stop words} semblent ne pas avoir une forte influence sur les performances de recherche. Fait intéressant, l'algorithme \textit{KStem} semble offrir une légère meilleure précision/rappel que l'algorithme \textit{PorterStem} par défaut. On semble observer également que la normalisation semble ne pas avoir une grande influence.\\
+
+On voit que le facteur ayant la plus grande influence est la pondération. L'index \verb;no_scoring; qui ne pondère pas les mots (ni tf*idf, ni normalisation) est l'index qui a les moins bons résultats.\\
+
+Comme précédemment mentionné, il est possible de vizualiser les graphiques associés à la précision et le rappel dans le répertoire \verb;graphics; après les avoir imprimés sous format html en utilisant l'option \verb;--graphics;.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

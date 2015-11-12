@@ -1,8 +1,11 @@
-require 'gruff'
 require 'nyaplot'
 
 module InformationRetrieval
 module PrecisionRecall
+
+class ::Nyaplot::Plot
+	alias :dump :export_html
+end
 
 class GraphicWriter
 	def initialize estimator
@@ -10,27 +13,25 @@ class GraphicWriter
 	end
 
 	def recall_graph
-		query_if_needed
-
-		g = Gruff::Bar.new
-		g.theme_pastel
-		g.title = "Recall of #{@estimator.index_name}"
-		g.labels = x_labels
-		g.data @estimator.index_name.to_sym, @estimator.recalls
-		
-		g
+		plot = Nyaplot::Plot.new
+		plot.x_label "request ID"
+		plot.y_label "recall"
+		plot.add :bar, x_labels, @estimator.recalls
+		plot.configure do
+  		width 1000
+		end
+		plot
 	end
 
 	def precision_graph
-		query_if_needed
-
-		g = Gruff::Bar.new
-		g.theme_pastel
-		g.title = "Precision of #{@estimator.index_name}"
-		g.labels = x_labels
-		g.data @estimator.index_name.to_sym, @estimator.precisions
-
-		g
+		plot = Nyaplot::Plot.new
+		plot.x_label "request ID"
+		plot.y_label "precisions"
+		plot.add :bar, x_labels, @estimator.precisions
+		plot.configure do
+  		width 1000
+		end
+		plot
 	end
 
 	def precision_vs_recall
@@ -70,23 +71,11 @@ class GraphicWriter
 	end
 
 	def x_labels
-		x_s = {}
-		c = 0
-		@estimator.pertinences.each_request do |request|
-			if c == 1 then c = 0; x_s.brute_push! " "; next end
-			x_s.brute_push! request.id.to_s
-			c = 1
-		end
-		x_s
+		xs = (1..@estimator.precisions.length).to_a
+		xs.each_with_index { |x, i| xs[i] = x.to_s }
 	end
 
-	def query_if_needed
-		if @estimator.precisions.empty? or @estimator.recalls.empty?
-			@estimator.query_index
-		end
-	end
-
-	private :x_labels, :query_if_needed
+	private :x_labels
 end
 
 end

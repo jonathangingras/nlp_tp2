@@ -19,34 +19,96 @@ class Explaination
 	end
 end
 
+class RequestResult
+	def initialize args
+		@expected = args[:expected]
+		@returned = args[:returned]
+		@request = args[:request]
+	end
+
+	def recall
+		(@returned & @expected).length.to_f / @expected.length.to_f
+	end
+
+	def precision
+		(@returned & @expected).length.to_f / @returned.length.to_f
+	end
+
+	def rank
+		index = @returned.find_index @expected[0]
+		unless index.nil?
+			return index + 1
+		end
+		0
+	end
+
+	def reciprocal_rank
+		rank_ = rank
+		unless rank_ == 0
+			return rank ** -1
+		end
+		0
+	end
+
+	attr_reader :request
+end
+
 class Estimator
 	def initialize index_name, elastic_search, pertinences
 		@elastic_search = elastic_search
 		@pertinences = pertinences
-		@precisions = []
-		@recalls = []
 		@index_name = index_name
+		@results = []
+		@cheating = false
 	end
 
-	def query_index &block
+	def cheat
+		@cheating = true
+	end
+
+	def reset
+		@results = []
+	end
+
+	def query_index size=50
 		index = @elastic_search.retrieve_index @index_name
 		
 		@pertinences.each_request do |request|
+			size = request.pertinent_keys.length if @cheating
+
 			expected_keys = request.pertinent_keys
-			returned_keys, = index.match_atts :key, request.string_request
+			returned_keys, = index.match_atts :key, request.string_request, size
 
-			precision = (returned_keys & expected_keys).length.to_f / returned_keys.length.to_f
-			recall = (returned_keys & expected_keys).length.to_f / expected_keys.length.to_f
-			@precisions << precision
-			@recalls << recall
-
-			unless block.nil? then block.call request, precision, recall end
+			@results << RequestResult.new(
+				request: request,
+				expected: expected_keys, 
+				returned: returned_keys
+			)
 		end
 
 		nil
 	end
 
+	def recalls
+		query_if_needed
+		recalls = []
+		@results.each do |result|
+			recalls << result.recall
+		end
+		recalls
+	end
+
+	def precisions
+		query_if_needed
+		precisions = []
+		@results.each do |result|
+			precisions << result.precision
+		end
+		precisions
+	end
+
 	def explain request_id
+		query_if_needed
 		index = @elastic_search.retrieve_index @index_name
 		scores = []
 		returned_ids, = index.match_atts :id, @pertinences[request_id].string_request
@@ -59,13 +121,32 @@ class Estimator
 	end
 
 	def means
-		if @precisions.empty? or @recalls.empty?
-			query_index
-		end
-		"#{@index_name} means: #{Estimation.new @precisions.mean, @recalls.mean}"
+		query_if_needed
+		"index: #{@index_name}, #{Estimation.new precisions.mean, recalls.mean}, MRR: #{mean_reciprocal_rank}"
 	end
 
-	attr_reader :index_name, :pertinences, :precisions, :recalls
+	def each_result &block
+		query_if_needed
+		@results.each { |result| block.call result }
+	end
+
+	def query_if_needed
+		if @results.empty?
+			query_index
+		end
+	end
+
+	def mean_reciprocal_rank
+		query_if_needed
+		ranks = []
+		each_result do |result|
+			ranks << result.reciprocal_rank
+		end
+		ranks.mean
+	end
+
+	attr_reader :index_name, :pertinences
+	private :query_if_needed
 end
 
 end
